@@ -342,6 +342,9 @@ function pages_meta_save( $post_id ) {
 add_action( 'save_post', 'pages_meta_save' );
 
 //automatic updater via git
+
+include_once('updater.php');
+
 if (is_admin()) { // note the use of is_admin() to double check that this is happening in the admin
         $config = array(
             'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
@@ -349,7 +352,7 @@ if (is_admin()) { // note the use of is_admin() to double check that this is hap
             'api_url' => 'https://github.com/martinskou/popup-infoserv', // the GitHub API url of your GitHub repo
             'raw_url' => 'https://raw.githubusercontent.com/martinskou/popup-infoserv/master/init.php?token=AOuBVDMn0N5W_4tw_DXaBKh1V3hhvjUxks5aVczdwA%3D%3D', // the GitHub raw url of your GitHub repo
             'github_url' => 'https://github.com/martinskou/popup-infoserv', // the GitHub url of your GitHub repo
-            'zip_url' => 'https://github.com/username/repository-name/zipball/master', // the zip url of the GitHub repo
+            'zip_url' => 'https://github.com/martinskou/popup-infoserv/archive/master.zip', // the zip url of the GitHub repo
             'sslverify' => true, // whether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
             'requires' => '3.0', // which version of WordPress does your plugin require?
             'tested' => '3.3', // which version of WordPress is your plugin tested up to?
