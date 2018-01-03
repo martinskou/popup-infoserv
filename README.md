@@ -1,0 +1,2 @@
+# popup-infoserv
+Wordpress plugin
