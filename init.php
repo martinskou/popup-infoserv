@@ -64,8 +64,9 @@ function pui_enqueue_script() {
     $popups = array();
 
     while ( $pui_query->have_posts() ) : $pui_query->the_post();
-
-   
+        $trigger_arr = get_post_meta(get_the_ID(), 'triggers', false);
+        $trigger_type = get_post_meta(get_the_ID(), 'trigger_type', true);
+        if($trigger_type == "all"){
         $popups[] = array(
                         "id" => get_the_ID(),
                         "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
@@ -75,6 +76,20 @@ function pui_enqueue_script() {
                         "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
                         "thisPageId" => (string)get_queried_object_id(),
                         );
+    }
+    if($trigger_type == "specific"){
+        if(in_array((string)get_queried_object_id(), $trigger_arr[0] ) ){
+            $popups[] = array(
+                        "id" => get_the_ID(),
+                        "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
+                        "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
+                        "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
+                        "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
+                        "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
+                        "thisPageId" => (string)get_queried_object_id(),
+                        );
+        }
+    }
     
     endwhile;
     wp_reset_postdata();
