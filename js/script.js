@@ -4,7 +4,7 @@ jQuery( document ).ready( function( $ ) {
 
     $.each(php_vars.popups, function(propName, propVal) {
         //console.log(this.id);
-        if(Cookies.get("popup-"+ this.id) != "yes"){  
+        if(Cookies.get("popup-popup-"+ this.id) != "yes"){  
             var popupDelay = Math.round(parseInt(this.popupDelay * 1000));
             var popupExpire = parseInt(this.popupExpire);
             var triggerType = this.triggerType;
