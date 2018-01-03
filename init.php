@@ -18,6 +18,18 @@ Author URI: http://www.infoserv.dk/
 if (!defined('ABSPATH')) exit;
 include( plugin_dir_path( __FILE__ ) . 'popups.php');
 
+require plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
+$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+    'https://github.com/martinskou/popup-infoserv/',
+    __FILE__,
+    'popup-infoserv'
+);
+
+//Optional: If you're using a private repository, specify the access token like this:
+$myUpdateChecker->setAuthentication('your-token-here');
+
+//Optional: Set the branch that contains the stable release.
+$myUpdateChecker->setBranch('stable-branch-name');
 
 add_action('plugins_loaded', 'pui_load_textdomain');
 
