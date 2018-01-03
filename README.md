@@ -1,3 +1,3 @@
 # popup-infoserv
 Wordpress plugin
-~Current Version:1.0.2~
+~Current Version:1.0.4~
