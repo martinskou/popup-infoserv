@@ -17,8 +17,7 @@ Author URI: http://www.infoserv.dk/
 */
 if (!defined('ABSPATH')) exit;
 include( plugin_dir_path( __FILE__ ) . 'popups.php');
-include( plugin_dir_path( __FILE__ ) . 'updater.php');
-include( plugin_dir_path( __FILE__ ) . 'update-plugin.php');
+
 
 add_action('plugins_loaded', 'pui_load_textdomain');
 
