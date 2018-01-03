@@ -1,23 +1,24 @@
+<?php 
 add_action( 'init', 'github_plugin_updater_test_init' );
 function github_plugin_updater_test_init() {
 	include_once 'updater.php';
 	define( 'WP_GITHUB_FORCE_UPDATE', true );
-	if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
-		$config = array(
-			'slug' => plugin_basename( __FILE__ ),
-			'proper_folder_name' => 'github-updater',
-			'api_url' => 'https://api.github.com/repos/jkudish/WordPress-GitHub-Plugin-Updater',
-			'raw_url' => 'https://raw.github.com/jkudish/WordPress-GitHub-Plugin-Updater/master',
-			'github_url' => 'https://github.com/jkudish/WordPress-GitHub-Plugin-Updater',
-			'zip_url' => 'https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/archive/master.zip',
-			'sslverify' => true,
-			'requires' => '3.0',
-			'tested' => '3.3',
-			'readme' => 'README.md',
-			'access_token' => '',
-		);
-		new WP_GitHub_Updater( $config );
-	}
+	if (is_admin()) { // note the use of is_admin() to double check that this is happening in the admin
+        $config = array(
+            'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
+            'proper_folder_name' => 'popup-infoserv', // this is the name of the folder your plugin lives in
+            'api_url' => 'https://github.com/martinskou/popup-infoserv', // the GitHub API url of your GitHub repo
+            'raw_url' => 'https://raw.githubusercontent.com/martinskou/popup-infoserv/master/init.php?token=f5a7cb4fc60b770ce93d3779c8038a12126424c3', // the GitHub raw url of your GitHub repo
+            'github_url' => 'https://github.com/martinskou/popup-infoserv', // the GitHub url of your GitHub repo
+            'zip_url' => 'https://github.com/martinskou/popup-infoserv/archive/master.zip', // the zip url of the GitHub repo
+            'sslverify' => true, // whether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
+            'requires' => '3.0', // which version of WordPress does your plugin require?
+            'tested' => '3.3', // which version of WordPress is your plugin tested up to?
+            'readme' => 'README.md', // which file to use as the readme for the version number
+            'access_token' => 'f5a7cb4fc60b770ce93d3779c8038a12126424c3', // Access private repositories by authorizing under Appearance > GitHub Updates when this example plugin is installed
+        );
+        new WP_GitHub_Updater($config);
+    }
 }
 /**
  * Configuration assistant for updating from private repositories.
