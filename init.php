@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop up with content of your choice. Works well with Divi Builder.
-Version: 1.0.4
+Version: 1.0.5
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -114,19 +114,19 @@ function create_performances() {
     register_post_type( 'popups',
         array(
             'labels' => array(
-                'name' => __('Pop ups', 'popup-by-infoserv'),
-                'singular_name' => __('pop up', 'popup-by-infoserv'),
+                'name' => __('Pop-ups', 'popup-by-infoserv'),
+                'singular_name' => __('pop-up', 'popup-by-infoserv'),
                 'add_new' => __('Tilføj ny'),
-                'add_new_item' => __('Tilføj ny pop up', 'popup-by-infoserv'),
+                'add_new_item' => __('Tilføj ny pop-up', 'popup-by-infoserv'),
                 'edit' => __('Rediger', 'popup-by-infoserv'),
-                'edit_item' => __('Rediger pop up', 'popup-by-infoserv'),
-                'new_item' => __('Ny pop up', 'popup-by-infoserv'),
+                'edit_item' => __('Rediger pop-up', 'popup-by-infoserv'),
+                'new_item' => __('Ny pop-up', 'popup-by-infoserv'),
                 'view' => __('Vis', 'popup-by-infoserv'),
                 'view_item' => __('Vis pop up', 'popup-by-infoserv'),
-                'search_items' => __('Søg i pop ups', 'popup-by-infoserv'),
-                'not_found' => __('Ingen pop ups fundet', 'popup-by-infoserv'),
+                'search_items' => __('Søg i pop-ups', 'popup-by-infoserv'),
+                'not_found' => __('Ingen pop-ups fundet', 'popup-by-infoserv'),
                 'not_found_in_trash' => __('Ingen pop upd fundet i papirkurven.', 'popup-by-infoserv'),
-                'parent' => __('Hoved pop up', 'popup-by-infoserv')
+                'parent' => __('Hoved pop-up', 'popup-by-infoserv')
             ),
             'public' => true,
             'menu_position' => 15,
@@ -150,7 +150,7 @@ add_filter( 'et_builder_post_types', 'my_et_builder_post_types' );
 function adding_custom_meta_boxes( $post_type, $post ) {
     add_meta_box( 
         'triggers',
-        __( 'Triggere' ),
+        __( 'Triggere', 'popup-by-infoserv' ),
         'render_triggers_meta_box',
         'popups',
         'side',
@@ -158,7 +158,7 @@ function adding_custom_meta_boxes( $post_type, $post ) {
     );
      add_meta_box( 
         'delay_popup',
-        __( 'Antal sekunder før pop up' ),
+        __( 'Antal sekunder før pop up' , 'popup-by-infoserv'),
         'render_delay_popup_meta_box',
         'popups',
         'side',
@@ -166,7 +166,7 @@ function adding_custom_meta_boxes( $post_type, $post ) {
     );
      add_meta_box( 
         'expire_popup',
-        __( 'Antal dage før pop up vises igen' ),
+        __( 'Antal dage før pop up vises igen', 'popup-by-infoserv' ),
         'render_expire_popup_meta_box',
         'popups',
         'side',
@@ -205,11 +205,11 @@ function get_post_pages($post){
 
 function get_trigger_type_input($trigger_type){
     $html ='<p style="float:left;width:100%;">
-        <label for="trigger_type" style=""><b>Vælg trigger</b></label></p>
+        <label for="trigger_type" style=""><b>'. __('Vælg trigger', 'popup-by-infoserv') .'</b></label></p>
         <select type="dropdown" name="trigger_type" id="trigger_type">
-            <option value="all" '. ($trigger_type == "all" ? ' selected' : ' ') .'>Alle sider</option>
-            <option value="specific" '. ($trigger_type == "specific" ? ' selected' : ' ') .'>Specifikke sider</option>
-            <option value="section" '. ($trigger_type == "section" ? ' selected' : ' ') .'>Ved scroll til sektion</option>
+            <option value="all" '. ($trigger_type == "all" ? ' selected' : ' ') .'>'. __('Alle sider', 'popup-by-infoserv') .'</option>
+            <option value="specific" '. ($trigger_type == "specific" ? ' selected' : ' ') .'>'. __('Specifikke sider', 'popup-by-infoserv') .'</option>
+            <option value="section" '. ($trigger_type == "section" ? ' selected' : ' ') .'>'. __('Ved scroll til sektion' , 'popup-by-infoserv') .'</option>
             </select>';
     return $html;
 }
@@ -223,7 +223,7 @@ function get_trigger_pages($post,$posts_array,$pages_stored_meta,$trigger_type){
                     <label for="meta-checkbox-'. get_the_id() .'">
                         <input type="checkbox" name="triggers[]" id="meta-checkbox-'. get_the_id() .'" value="'. get_the_id() .'" '. (in_array(get_the_id(), $pages_stored_meta[0]) ? ' checked' : ' ') .'  />
                         <strong>'. get_the_title() .'</strong>';
-                $html .= ($post->post_parent !== 0 ? '  (Forælder: '. get_the_title( $post->post_parent ) .')' : ''); 
+                $html .= ($post->post_parent !== 0 ? ' ' . __('(Forælder:', 'popup-by-infoserv') . get_the_title( $post->post_parent ) .')' : ''); 
                 $html .= ' (' . get_post_type(get_the_id()) . ')';
                 $html .= '</label>
                 </p>';
@@ -234,7 +234,7 @@ function get_trigger_pages($post,$posts_array,$pages_stored_meta,$trigger_type){
 }
 function get_trigger_section_input($post,$trigger_section,$trigger_type){
     $html ='<div id="trigger_section_container" style="'. ($trigger_type == 'section' ? ' ' : 'display:none;') .'"><p style="float:left;width:100%;">
-        <label for="trigger_section" style=""><b>ID på sektion</b></label></p><p><i>(eksempelvis #kontaktformular)</i></p>
+        <label for="trigger_section" style=""><b>'. __('ID på sektion', 'popup-by-infoserv') .'</b></label></p><p><i>(eksempelvis #kontaktformular)</i></p>
         <input type="text" id="trigger_section" name="trigger_section" value="'. $trigger_section .'"></div>';
     return $html;
 }
@@ -266,7 +266,7 @@ function render_triggers_meta_box($post) {
     //echo $trigger_type;
 
     $html = '<div class="prfx-row-content" style="width: 100%; ">';
-    $html .= '<p style="float:left;width:100%;"><label for="meta-checkbox-'. get_the_id() .'">Sæt regler op for, hvornår denne pop up skal vises.</label></p>';
+    $html .= '<p style="float:left;width:100%;"><label for="meta-checkbox-'. get_the_id() .'">'. __('Sæt regler op for, hvornår denne pop up skal vises.', 'popup-by-infoserv') .'</label></p>';
     $html .= get_trigger_type_input($trigger_type);
     $html .= get_trigger_pages($post,$posts_array,$pages_stored_meta,$trigger_type);
     $html .= get_trigger_section_input($post,$trigger_section,$trigger_type);
@@ -286,8 +286,8 @@ function render_expire_popup_meta_box($post) {
     //print_r($icons );
     $html = '<div class="prfx-row-content" style="width: 100%; height: 160px;">';
     $html .='<p style="float:left;">
-        <label for="expire_popup" style="">Når brugeren lukker pop-up vinduet, sættes en cookie. Vælg her, hvor mange dage denne cookie skal gælde, før pop up vinduet vises for denne bruger igen.<br></label></p>
-        <input type="number" name="expire_popup" id="expire_popup" value="'. $expire_popup .'" /><i>Standardværdi: 60</i>';
+        <label for="expire_popup" style="">'. __('Når brugeren lukker pop-up vinduet, sættes en cookie. Vælg her, hvor mange dage denne cookie skal gælde, før pop up vinduet vises for denne bruger igen.', 'popup-by-infoserv') .'<br></label></p>
+        <input type="number" name="expire_popup" id="expire_popup" value="'. $expire_popup .'" /><i>Standard: 60</i>';
     $html .= '</div>';
     echo $html;
 }
@@ -304,8 +304,8 @@ function render_delay_popup_meta_box($post) {
     //print_r($icons );
     $html = '<div class="prfx-row-content" style="width: 100%; height: 130px;">';
     $html .='<p style="float:left;">
-        <label for="delay_popup" style="">Vælg hvor mange sekunder der skal gå, før pop up vises, efter siden er loadet.<br></label></p>
-        <input type="number" name="delay_popup" id="delay_popup" value="'. $delay_popup .'" /><i>Standardværdi: 3</i>';
+        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop up vises, efter siden er loadet.', 'popup-by-infoserv') .'<br></label></p>
+        <input type="number" name="delay_popup" id="delay_popup" value="'. $delay_popup .'" /><i>Standard: 3</i>';
     $html .= '</div>';
     echo $html;
 }
