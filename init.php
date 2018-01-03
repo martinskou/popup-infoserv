@@ -17,6 +17,7 @@ Author URI: http://www.infoserv.dk/
 */
 if (!defined('ABSPATH')) exit;
 include( plugin_dir_path( __FILE__ ) . 'popups.php');
+include( plugin_dir_path( __FILE__ ) . 'update-plugin.php');
 
 add_action('plugins_loaded', 'pui_load_textdomain');
 
@@ -342,8 +343,6 @@ function pages_meta_save( $post_id ) {
 add_action( 'save_post', 'pages_meta_save' );
 
 //automatic updater via git
-
-include_once('updater.php');
 
 if (is_admin()) { // note the use of is_admin() to double check that this is happening in the admin
         $config = array(
