@@ -89,4 +89,12 @@ jQuery( document ).ready( function( $ ) {
             $('[data-popup]').fadeOut(350);
         } 
     });
+    $("[data-popup]").click(function(e) {
+        console.log(e);
+        if (e.hasOwnProperty("srcElement")) {
+            if (e.srcElement.className== "popup pui_popup") {
+                $(".popup-close").click();
+            }
+        }
+   });
 });
