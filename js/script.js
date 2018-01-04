@@ -82,4 +82,11 @@ jQuery( document ).ready( function( $ ) {
         $('#' + targeted_popup).fadeOut(350);
 		  e.preventDefault();
     });
+    //----- CLOSE ON ESCAPE
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) { 
+            //console.log("escape");
+            $('[data-popup]').fadeOut(350);
+        } 
+    });
 });
