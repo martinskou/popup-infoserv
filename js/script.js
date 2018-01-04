@@ -1,27 +1,81 @@
 jQuery( document ).ready( function( $ ) {
-     //----- OPEN
-
-
     $.each(php_vars.popups, function(propName, propVal) {
-        //console.log(this.id);
-        if(Cookies.get("popup-popup-"+ this.id) != "yes"){  
-            var popupDelay = Math.round(parseInt(this.popupDelay * 1000));
-            var popupExpire = parseInt(this.popupExpire);
-            var triggerType = this.triggerType;
-            var triggerSection = this.triggerSection;
+        if(Cookies.get("popup-"+ propVal.popupId) != "yes"){  
+            var popupDelay = Math.round(parseInt(propVal.popupDelay * 1000)),
+                popupExpire = parseInt(propVal.popupExpire),
+                triggerType = propVal.triggerType,
+                triggerSection = propVal.triggerSection,
+                impressions = propVal.impressions,
+                adminUrl = propVal.ajaxurl,
+                statsNonce = propVal.ajax_nonce,
+                popupId = propVal.popupId;
 
+            if(impressions == ""){
+                impressions = 0;
+            }
+
+            console.log(impressions);
             if(triggerType == "section"){
-              
+                $(window).scroll(function() {
+                    var targetOffset = $(triggerSection).offset().top,
+                        wS = $(this).scrollTop();
+                       
+                    if (wS > targetOffset){
+                        //console.log(popupId);  
+                        $('#popup-' + popupId).fadeIn(350, function() {
+                            Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
+                            jQuery.ajax({ // We use jQuery instead $ sign, because Wordpress convention.
+                                url : adminUrl, // This addres will redirect the query to the functions.php file, where we coded the function that we need.
+                                type : 'POST',
+                                data : {
+                                    action : 'pui_stats_action', 
+                                    fieldvalue : impressions,
+                                    security: statsNonce,
+                                    postid : popupId
+                                },
+                                beforeSend: function() {
+                                       //console.log('Updating Field');
+                                },
+                                success : function( response ) {
+                                     //console.log('Success');
+                                },
+                                complete: function(){
+                                    //alert( "Field updated");
+                                }
+                            });
+                        });
+                        $(window).off('scroll');
+                   }
+                });
             }
             else{
-                $('#popup-' + this.id).delay( popupDelay ).fadeIn(350, function() {
-                    Cookies.set("popup-" + this.id , "yes", {expires: popupExpire, path: '/'});
+                $('#popup-' + popupId).delay( popupDelay ).fadeIn(350, function() {
+                    impressions = parseInt(impressions) + 1;
+                    Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
+                    jQuery.ajax({ // We use jQuery instead $ sign, because Wordpress convention.
+                        url : adminUrl, // This addres will redirect the query to the functions.php file, where we coded the function that we need.
+                        type : 'POST',
+                        data : {
+                            action : 'pui_stats_action', 
+                            fieldvalue : impressions,
+                            security: statsNonce,
+                            postid : popupId
+                        },
+                        beforeSend: function() {
+                               //console.log('Updating Field');
+                        },
+                        success : function( response ) {
+                             //console.log('Success');
+                        },
+                        complete: function(){
+                            //alert( "Field updated");
+                        }
+                    });
                 });
             }
         }
        
     });
-
     //----- CLOSE
     $('[data-popup-close]').on('click', function(e)  {
         var targeted_popup = $(this).attr('data-popup-close');

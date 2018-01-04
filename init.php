@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop up with content of your choice. Works well with Divi Builder.
-Version: 1.0.9
+Version: 1.10.0
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -18,6 +18,7 @@ Author URI: http://www.infoserv.dk/
 if (!defined('ABSPATH')) exit;
 include( plugin_dir_path( __FILE__ ) . 'popups.php');
 
+//check if any updates on github
 require plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
     'https://github.com/martinskou/popup-infoserv/',
@@ -31,6 +32,8 @@ $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 //Optional: Set the branch that contains the stable release.
 //$myUpdateChecker->setBranch('stable-branch-name');
 
+
+//ready for translation
 add_action('plugins_loaded', 'pui_load_textdomain');
 
 function pui_load_textdomain() {
@@ -49,6 +52,7 @@ function pui_load_plugin_css() {
 
 add_action('wp_enqueue_scripts', 'pui_enqueue_script');
 
+//adding scripts and localizing them with WP data
 function pui_enqueue_script() {   
     wp_register_script('cookie_js', plugin_dir_url( __FILE__ ) . 'js/js-cookie.js', array( 'jquery' ), mt_rand(10,1000), true );
     wp_enqueue_script('cookie_js');
@@ -66,29 +70,49 @@ function pui_enqueue_script() {
     while ( $pui_query->have_posts() ) : $pui_query->the_post();
         $trigger_arr = get_post_meta(get_the_ID(), 'triggers', false);
         $trigger_type = get_post_meta(get_the_ID(), 'trigger_type', true);
-        if($trigger_type == "all"){
+    if($trigger_type == "all"){
         $popups[] = array(
-                        "id" => get_the_ID(),
+                        "popupId" => get_the_ID(),
                         "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
                         "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
                         "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
                         "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
                         "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
+                        "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
                         "thisPageId" => (string)get_queried_object_id(),
+                        "ajaxurl" => admin_url("admin-ajax.php", $protocol),
+                        "ajax_nonce" => wp_create_nonce("stats_nonce"),
                         );
     }
     if($trigger_type == "specific"){
         if(in_array((string)get_queried_object_id(), $trigger_arr[0] ) ){
             $popups[] = array(
-                        "id" => get_the_ID(),
+                        "popupId" => get_the_ID(),
                         "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
                         "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
                         "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
                         "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
                         "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
+                        "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
                         "thisPageId" => (string)get_queried_object_id(),
+                        "ajaxurl" => admin_url("admin-ajax.php", $protocol),
+                        "ajax_nonce" => wp_create_nonce("stats_nonce"),
                         );
         }
+    }
+    if($trigger_type == "section"){
+        $popups[] = array(
+                        "popupId" => get_the_ID(),
+                        "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
+                        "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
+                        "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
+                        "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
+                        "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
+                        "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
+                        "thisPageId" => (string)get_queried_object_id(),
+                        "ajaxurl" => admin_url("admin-ajax.php", $protocol),
+                        "ajax_nonce" => wp_create_nonce("stats_nonce"),
+                        );
     }
     
     endwhile;
@@ -102,7 +126,7 @@ function pui_enqueue_script() {
 
 }
 
-
+//script for admin editing of popup post type
 add_action('admin_enqueue_scripts', 'pui_admin_enqueue_script');
 
 function pui_admin_enqueue_script( $hook_suffix ){
@@ -119,13 +143,10 @@ function pui_admin_enqueue_script( $hook_suffix ){
     //}
 }
 
+//creating the popup posttype
+add_action( 'init', 'create_popup_posttype' );
 
-
-
-
-add_action( 'init', 'create_performances' );
-
-function create_performances() {
+function create_popup_posttype() {
     register_post_type( 'popups',
         array(
             'labels' => array(
@@ -148,11 +169,14 @@ function create_performances() {
             'supports' => array( 'title', 'editor', 'custom-fields' ),
             'taxonomies' => array(),
             'has_archive' => false,
+            'publicly_queryable'  => false,
+            'show_in_admin_bar'   => false,
             'rewrite' => array('slug' => 'pop-ups', 'with_front' => false)
         )
     );
 };
- 
+
+//enabling the Divi Builder if activated
 function my_et_builder_post_types( $post_types ) {
     $post_types[] = 'popups';
      
@@ -325,7 +349,7 @@ function render_delay_popup_meta_box($post) {
     echo $html;
 }
 
-// Saves the custom meta input for 'icons' 
+// Saves the custom meta inputs 
 function pages_meta_save( $post_id ) {
         
         $trigger_type = "all";
@@ -368,3 +392,58 @@ function pages_meta_save( $post_id ) {
  
 }
 add_action( 'save_post', 'pages_meta_save' );
+
+//updating statistics on pop up
+
+add_action( 'wp_ajax_pui_stats_action', 'pui_stats_action' );
+add_action( 'wp_ajax_nopriv_pui_stats_action', 'pui_stats_action' ); // This lines it's because we are using AJAX on the FrontEnd.
+
+function pui_stats_action(){
+    check_ajax_referer( 'stats_nonce', 'security' );
+    $fieldname = "impressions"; // This variable will get the POST 'fieldname'
+    $fieldvalue = $_POST['fieldvalue'];  // This variable will get the POST 'fieldvalue'
+    $postid = $_POST['postid'];             // This variable will get the POST 'postid'
+
+    $current_user = wp_get_current_user();
+    
+    //only updating stats count if admin is not logged in
+    if(!user_can( $current_user, 'administrator' )){
+        update_post_meta($postid, $fieldname, $fieldvalue); // We will update the field.
+    }
+    
+    wp_die(); // this is required to terminate immediately and return a proper response
+} 
+
+
+//adding statistics to list view in admin
+add_filter('manage_popups_posts_columns', 'bs_popup_table_head');
+function bs_popup_table_head( $defaults ) {
+    $defaults['impressions'] = __('Visninger', 'popup-by-infoserv');
+    return $defaults;
+}
+
+add_action( 'manage_popups_posts_custom_column', 'bs_popup_table_content', 10, 2 );
+
+function bs_popup_table_content( $column_name, $post_id ) {
+    if ($column_name == 'impressions') {
+    echo get_post_meta( $post_id, 'impressions', true );
+    }
+
+}
+add_filter( 'manage_edit-popups_sortable_columns', 'bs_popup_table_sorting' );
+function bs_popup_table_sorting( $columns ) {
+  $columns['impressions'] = 'impressions';
+  return $columns;
+}
+
+add_filter( 'request', 'bs_popup_id_column_orderby' );
+function bs_popup_id_column_orderby( $vars ) {
+    if ( isset( $vars['orderby'] ) && 'impressions' == $vars['orderby'] ) {
+        $vars = array_merge( $vars, array(
+            'meta_key' => 'impressions',
+            'orderby' => 'meta_value_num'
+        ) );
+    }
+
+    return $vars;
+}
