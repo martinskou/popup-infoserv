@@ -1,8 +1,11 @@
 # popup-infoserv
 Wordpress plugin
-~Current Version:1.11.0~
+~Current Version:1.10.3~
 
 == Changelog ==
+1.10.3
+- Fixed version number
+
 1.10.2
 - Sanitizing inputs on updating popups post type
 
