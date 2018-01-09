@@ -3,6 +3,9 @@ Wordpress plugin
 ~Current Version:1.11.0~
 
 == Changelog ==
+1.10.2
+- Sanitizing inputs on updating popups post type
+
 1.10.1:
 - Close pop-up on escape and click on outer overlay
 

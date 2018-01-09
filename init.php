@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop up with content of your choice. Works well with Divi Builder.
-Version: 1.10.1
+Version: 1.10.2
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -357,39 +357,44 @@ function pages_meta_save( $post_id ) {
         $triggers = array();
         $expire_popup = "60";
         $delay_popup = "3";
+
+        // If this isn't a 'popups' post, don't update it.
+        $post_type = get_post_type($post_id);
+        if ( "popups" != $post_type ) return;
+        
         // Checks for input and sanitizes/saves if needed
         if( isset( $_POST[ 'triggers' ]) && wp_verify_nonce($_POST['wp_triggers_nonce'], plugin_basename(__FILE__)) ) {
             $triggers = $_POST[ 'triggers' ];
             
         }
         if( isset( $_POST[ 'trigger_type' ]) && wp_verify_nonce($_POST['wp_triggers_nonce'], plugin_basename(__FILE__)) ) {
-            $trigger_type = $_POST[ 'trigger_type' ];
+            $trigger_type = sanitize_text_field($_POST[ 'trigger_type' ]);
             
         }
         if( isset( $_POST[ 'trigger_section' ]) && wp_verify_nonce($_POST['wp_triggers_nonce'], plugin_basename(__FILE__)) ) {
-            $trigger_section = $_POST[ 'trigger_section' ];
+            $trigger_section = sanitize_text_field($_POST[ 'trigger_section' ]);
             
         }
 
         if( isset( $_POST[ 'expire_popup' ]) && wp_verify_nonce($_POST['wp_expire_popup_nonce'], plugin_basename(__FILE__)) ) {
-            $expire_popup = $_POST[ 'expire_popup' ];
+            $expire_popup = sanitize_text_field($_POST[ 'expire_popup' ]);
             
         }
         if( isset( $_POST[ 'delay_popup' ]) && wp_verify_nonce($_POST['wp_delay_popup_nonce'], plugin_basename(__FILE__)) ) {
-            $delay_popup = $_POST[ 'delay_popup' ];
+            $delay_popup = sanitize_text_field($_POST[ 'delay_popup' ]);
             
         }
-      
-        update_post_meta( $post_id, 'triggers', $triggers );
-
-        update_post_meta( $post_id, 'trigger_type', $trigger_type );
-
-        update_post_meta( $post_id, 'trigger_section', $trigger_section );
-
-        update_post_meta( $post_id, 'expire_popup', $expire_popup );
-
-        update_post_meta( $post_id, 'delay_popup', $delay_popup );
- 
+        $meta = array(
+                    array('name' => 'triggers', 'value' => $triggers),
+                    array('name' => 'trigger_type', 'value' => $trigger_type),
+                    array('name' => 'trigger_section', 'value' => $trigger_section ),
+                    array('name' => 'expire_popup', 'value' => $expire_popup ),
+                    array('name' => 'delay_popup', 'value' => $delay_popup )
+                    );
+        
+        foreach($meta as $mt){
+            update_post_meta( $post_id, $mt['name'], $mt['value']);
+        }
 }
 add_action( 'save_post', 'pages_meta_save' );
 
