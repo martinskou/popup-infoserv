@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.0~
+~Current Version:1.2.1~
 
 == Changelog ==
+1.2.1
+- Specific pages trigger didn't work properly, now fixed.
+
 1.2.0
 - New trigger: Exit intent, when users are about to leave the page, the pop-up shows.
 - Optimized plugin code
