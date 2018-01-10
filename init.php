@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop up with content of your choice. Works well with Divi Builder.
-Version: 1.10.3
+Version: 1.2.0
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -18,8 +18,10 @@ Author URI: http://www.infoserv.dk/
 if (!defined('ABSPATH')) exit;
 include( plugin_dir_path( __FILE__ ) . 'popups.php');
 
+
+
 //check if any updates on github
-require plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
+require plugin_dir_path( __FILE__ ) . 'assets/plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
     'https://github.com/martinskou/popup-infoserv/',
     __FILE__,
@@ -54,9 +56,16 @@ add_action('wp_enqueue_scripts', 'pui_enqueue_script');
 
 //adding scripts and localizing them with WP data
 function pui_enqueue_script() {   
-    wp_register_script('cookie_js', plugin_dir_url( __FILE__ ) . 'js/js-cookie.js', array( 'jquery' ), mt_rand(10,1000), true );
+    
+    //registering cookie jquery library
+    wp_register_script('cookie_js', plugin_dir_url( __FILE__ ) . 'assets/js-cookie.js', array( 'jquery' ), "", true );
     wp_enqueue_script('cookie_js');
 
+    //registering plugin script
+    wp_register_script( 'pui_exit_intent_js', plugin_dir_url( __FILE__ ) . 'assets/jquery.exitintent.min.js' , array( 'jquery' ), "", true );
+    wp_enqueue_script('pui_exit_intent_js');
+
+    //registering plugin script
     wp_register_script( 'pui_script_js', plugin_dir_url( __FILE__ ) . 'js/script.js' , array( 'jquery' ), mt_rand(10,1000) );
     wp_enqueue_script('pui_script_js');
     // The Query
@@ -67,53 +76,35 @@ function pui_enqueue_script() {
     $pui_query = new WP_Query( $args );
     $popups = array();
 
+    $protocol = isset( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
+
     while ( $pui_query->have_posts() ) : $pui_query->the_post();
         $trigger_arr = get_post_meta(get_the_ID(), 'triggers', false);
         $trigger_type = get_post_meta(get_the_ID(), 'trigger_type', true);
-    if($trigger_type == "all"){
-        $popups[] = array(
-                        "popupId" => get_the_ID(),
-                        "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
-                        "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
-                        "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
-                        "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
-                        "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
-                        "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
-                        "thisPageId" => (string)get_queried_object_id(),
-                        "ajaxurl" => admin_url("admin-ajax.php", $protocol),
-                        "ajax_nonce" => wp_create_nonce("stats_nonce"),
-                        );
-    }
-    if($trigger_type == "specific"){
-        if(in_array((string)get_queried_object_id(), $trigger_arr[0] ) ){
-            $popups[] = array(
-                        "popupId" => get_the_ID(),
-                        "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
-                        "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
-                        "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
-                        "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
-                        "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
-                        "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
-                        "thisPageId" => (string)get_queried_object_id(),
-                        "ajaxurl" => admin_url("admin-ajax.php", $protocol),
-                        "ajax_nonce" => wp_create_nonce("stats_nonce"),
-                        );
+        
+        $default_val = array("popupId" => get_the_ID(),
+                             "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
+                             "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
+                             "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
+                             "thisPageId" => (string)get_queried_object_id(),
+                             "ajaxurl" => admin_url("admin-ajax.php", $protocol),
+                             "ajax_nonce" => wp_create_nonce("stats_nonce"));
+
+        switch ($trigger_type) {
+            case "all":
+                array_push($popups, array_merge($default_val, array("popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true))));
+                break;
+            case "specific":
+                array_push($popups, array_merge($default_val, array("popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
+                                                                    "triggers" => get_post_meta(get_the_ID(), 'triggers', false))));
+                break;
+            case "section":
+                array_push($popups, array_merge($default_val, array("triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true))));
+                break;
+            case "exitintent":
+                array_push($popups, array_merge($default_val, array("popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true))));
+                break;
         }
-    }
-    if($trigger_type == "section"){
-        $popups[] = array(
-                        "popupId" => get_the_ID(),
-                        "popupExpire" => get_post_meta(get_the_ID(), 'expire_popup', true),
-                        "popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true),
-                        "triggers" => get_post_meta(get_the_ID(), 'triggers', false),
-                        "triggerType" => get_post_meta(get_the_ID(), 'trigger_type', true),
-                        "triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true),
-                        "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
-                        "thisPageId" => (string)get_queried_object_id(),
-                        "ajaxurl" => admin_url("admin-ajax.php", $protocol),
-                        "ajax_nonce" => wp_create_nonce("stats_nonce"),
-                        );
-    }
     
     endwhile;
     wp_reset_postdata();
@@ -249,6 +240,7 @@ function get_trigger_type_input($trigger_type){
             <option value="all" '. ($trigger_type == "all" ? ' selected' : ' ') .'>'. __('Alle sider', 'popup-by-infoserv') .'</option>
             <option value="specific" '. ($trigger_type == "specific" ? ' selected' : ' ') .'>'. __('Specifikke sider', 'popup-by-infoserv') .'</option>
             <option value="section" '. ($trigger_type == "section" ? ' selected' : ' ') .'>'. __('Ved scroll til sektion' , 'popup-by-infoserv') .'</option>
+            <option value="exitintent" '. ($trigger_type == "exitintent" ? ' selected' : ' ') .'>'. __('På vej væk fra siden' , 'popup-by-infoserv') .'</option>
             </select>';
     return $html;
 }
@@ -325,15 +317,15 @@ function render_expire_popup_meta_box($post) {
     //print_r($icons );
     $html = '<div class="prfx-row-content" style="width: 100%; height: 160px;">';
     $html .='<p style="float:left;">
-        <label for="expire_popup" style="">'. __('Når brugeren lukker pop-up vinduet, sættes en cookie. Vælg her, hvor mange dage denne cookie skal gælde, før pop up vinduet vises for denne bruger igen.', 'popup-by-infoserv') .'<br></label></p>
-        <input type="number" name="expire_popup" id="expire_popup" value="'. $expire_popup .'" /><i>Standard: 60</i>';
+        <label for="expire_popup" style="">'. __('Når brugeren lukker pop-up vinduet, sættes en cookie. Vælg her, hvor mange dage denne cookie skal gælde, før pop up vinduet vises for samme bruger igen.', 'popup-by-infoserv') .'<br></label></p>
+        <input type="number" name="expire_popup" id="expire_popup" value="'. $expire_popup .'" /><div><i>Standard: 60</i></div>';
     $html .= '</div>';
     echo $html;
 }
 
 function render_delay_popup_meta_box($post) {
     wp_nonce_field(plugin_basename(__FILE__), 'wp_delay_popup_nonce');
-    
+  
     if(!empty(get_post_meta( $post->ID, 'delay_popup' ))){
         $delay_popup = get_post_meta( $post->ID, 'delay_popup', true );
     }
@@ -341,10 +333,10 @@ function render_delay_popup_meta_box($post) {
         $delay_popup = "3";
     }
     //print_r($icons );
-    $html = '<div class="prfx-row-content" style="width: 100%; height: 130px;">';
+    $html = '<div class="prfx-row-content" style="width: 100%; height: 180px;">';
     $html .='<p style="float:left;">
-        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop up vises, efter siden er loadet.', 'popup-by-infoserv') .'<br></label></p>
-        <input type="number" name="delay_popup" id="delay_popup" value="'. $delay_popup .'" /><i>Standard: 3</i>';
+        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop up vises, efter siden er loadet. Denne indstilling bliver ignoreret ved følgende triggers: "Scroll til sektion" og "På vej væk fra siden."', 'popup-by-infoserv') .'<br></label></p>
+        <input type="number" name="delay_popup" id="delay_popup" value="'. $delay_popup .'" /><div><i>Standard: 3</i></div>';
     $html .= '</div>';
     echo $html;
 }
@@ -417,7 +409,7 @@ function pui_stats_action(){
     }
     
     wp_die(); // this is required to terminate immediately and return a proper response
-} 
+};
 
 
 //adding statistics to list view in admin
@@ -434,12 +426,13 @@ function bs_popup_table_content( $column_name, $post_id ) {
     echo get_post_meta( $post_id, 'impressions', true );
     }
 
-}
+};
+
 add_filter( 'manage_edit-popups_sortable_columns', 'bs_popup_table_sorting' );
 function bs_popup_table_sorting( $columns ) {
   $columns['impressions'] = 'impressions';
   return $columns;
-}
+};
 
 add_filter( 'request', 'bs_popup_id_column_orderby' );
 function bs_popup_id_column_orderby( $vars ) {
@@ -451,4 +444,4 @@ function bs_popup_id_column_orderby( $vars ) {
     }
 
     return $vars;
-}
+};

@@ -16,35 +16,26 @@ function get_popups(){
 			$trigger_arr = get_post_meta(get_the_ID(), 'triggers', false);
 			$trigger_type = get_post_meta(get_the_ID(), 'trigger_type', true);
 
-			if($trigger_type == "all"){
-				echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
-						    <div class="popup-inner">
-						      '. do_shortcode(get_the_content()) .'
-						     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
-						        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
-						    </div>
-						</div>';
-			}
-			if($trigger_type == "specific"){
-				if(in_array((string)get_queried_object_id(), $trigger_arr[0] ) ){
-				echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
-						    <div class="popup-inner">
-						      '. do_shortcode(get_the_content()) .'
-						     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
-						        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
-						    </div>
-						</div>';
-				}
-			}
-			if($trigger_type == "section"){
-				echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
-						    <div class="popup-inner">
-						      '. do_shortcode(get_the_content()) .'
-						     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
-						        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
-						    </div>
-						</div>';
-			}
+			switch ($trigger_type) {
+	            case "all":
+	            	echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
+							    <div class="popup-inner">
+							      '. do_shortcode(get_the_content()) .'
+							     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
+							        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
+							    </div>
+							</div>';
+					break;
+	            default: 
+	            	echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
+							    <div class="popup-inner">
+							      '. do_shortcode(get_the_content()) .'
+							     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
+							        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
+							    </div>
+							</div>';
+					break;
+        	}
 		}
 		/* Restore original Post Data */
 		wp_reset_postdata();
