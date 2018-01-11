@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.4~
+~Current Version:1.2.5~
 
 == Changelog ==
+1.2.5
+- better analytics guide text
+
 1.2.4
 - fixed a problem with Analytics tracking regarding goal/conversion
 

@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop-ups with content of your choice. Works well with Divi Builder.
-Version: 1.2.4
+Version: 1.2.5
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -354,11 +354,12 @@ function render_tracking_popup_meta_box($post) {
     $html = '<div class="prfx-row-content" style="width: 100%; ">';
     $html .='<p style="">'. __('Inden du aktiverer tracking, venligst tjek efter om du har inkluderet Google Analytics tracking script.', 'popup-by-infoserv') .'<br></p>
        <div><label for="tracking_popup" style=""><input type="checkbox" name="tracking_popup" id="tracking_popup" value="true" '. ($tracking_popup !== 'true' ? ' ' : ' checked ') .'/> Aktiver tracking</label></div>';
-     $html .='<p style="">'. __('Opsæt disse to hændelses-mål på din Google Analytics konto:', 'popup-by-infoserv') .'<br></p>';
-     $html .='<ul><li style="">'. __('Kategori: popup, Handling: show', 'popup-by-infoserv') .'</li>';
-     $html .='<li style="">'. __('Kategori: popup, Handling: close', 'popup-by-infoserv') .'</li></ul>';
+     $html .='<p style="">'. __('Opsæt følgende hændelses-mål på din Google Analytics konto:', 'popup-by-infoserv') .'<br></p>';
+     $html .='<ul><li style="">'. __('Kategori: "Er lig med" popup', 'popup-by-infoserv') .'</li>';
+     $html .='<li style="">'. __('Handling: "Er lig med" show', 'popup-by-infoserv') .'</li>';
+     $html .='<li style="">'. __('Værdi: "Større end" 0', 'popup-by-infoserv') .'</li></ul>';
      $html .='<h4>'. __('Konverteringsmål', 'popup-by-infoserv') .'</h4><p style="">'. __('Opsæt konverteringsmål ved at indtaste ID på det element, som skal fungere som konvertering.', 'popup-by-infoserv') .'<br></p>
-       <div><p><label for="tracking_object_popup" style="">'. __('ID på konverterings-element:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_object_popup" id="tracking_object_popup" value="'. $tracking_object_popup .'" /><div><i>(eksempelvis #knap)</i></div></div></div>';
+       <div><p><label for="tracking_object_popup" style="">'. __('ID på konverterings-element:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_object_popup" id="tracking_object_popup" value="'. $tracking_object_popup .'" /><div><i>(eksempelvis #knap)</i></div></div>';
     $html .= '</div>';
     echo $html;
 }
