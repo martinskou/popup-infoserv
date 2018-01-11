@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.2~
+~Current Version:1.2.3~
 
 == Changelog ==
+1.2.3
+- fixed version number
+
 1.2.2
 - Google Analytics tracking now possible for each pop-up. Set tracking for open and close - and for your own custom conversion target. Remember to include Analytics tracking script before activating.
 

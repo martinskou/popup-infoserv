@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Pop-up by Infoserv
+Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop-ups with content of your choice. Works well with Divi Builder.
-Version: 1.2.2
+Version: 1.2.3
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
