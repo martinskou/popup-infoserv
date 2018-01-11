@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop-ups with content of your choice. Works well with Divi Builder.
-Version: 1.2.3
+Version: 1.2.4
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -91,7 +91,6 @@ function pui_enqueue_script() {
                              "ajax_nonce" => wp_create_nonce("stats_nonce"),
                              "tracking" => get_post_meta(get_the_ID(), 'tracking_popup', true),
                              "trackingObject" => get_post_meta(get_the_ID(), 'tracking_object_popup', true),
-                             "trackingName" => get_post_meta(get_the_ID(), 'tracking_name_popup', true),
                              );
 
         switch ($trigger_type) {
@@ -350,12 +349,7 @@ function render_tracking_popup_meta_box($post) {
     else{
         $tracking_object_popup = "";
     }
-    if(!empty(get_post_meta( $post->ID, 'tracking_name_popup' ))){
-        $tracking_name_popup = get_post_meta( $post->ID, 'tracking_name_popup', true );
-    }
-    else{
-        $tracking_name_popup = "";
-    }
+    
    
     $html = '<div class="prfx-row-content" style="width: 100%; ">';
     $html .='<p style="">'. __('Inden du aktiverer tracking, venligst tjek efter om du har inkluderet Google Analytics tracking script.', 'popup-by-infoserv') .'<br></p>
@@ -364,8 +358,7 @@ function render_tracking_popup_meta_box($post) {
      $html .='<ul><li style="">'. __('Kategori: popup, Handling: show', 'popup-by-infoserv') .'</li>';
      $html .='<li style="">'. __('Kategori: popup, Handling: close', 'popup-by-infoserv') .'</li></ul>';
      $html .='<h4>'. __('Konverteringsmål', 'popup-by-infoserv') .'</h4><p style="">'. __('Opsæt konverteringsmål ved at indtaste ID på det element, som skal fungere som konvertering.', 'popup-by-infoserv') .'<br></p>
-       <div><p><label for="tracking_object_popup" style="">'. __('ID på konverterings-element:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_object_popup" id="tracking_object_popup" value="'. $tracking_object_popup .'" /><div><i>(eksempelvis #knap)</i></div>
-       <p><label for="tracking_name_popup" style="">'. __('Konverteringsnavn:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_name_popup" id="tracking_name_popup" value="'. $tracking_name_popup .'" /><div><i>(Husk at angive dette som handling i Analytics)</i></div></div>';
+       <div><p><label for="tracking_object_popup" style="">'. __('ID på konverterings-element:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_object_popup" id="tracking_object_popup" value="'. $tracking_object_popup .'" /><div><i>(eksempelvis #knap)</i></div></div></div>';
     $html .= '</div>';
     echo $html;
 }
@@ -432,7 +425,6 @@ function pages_meta_save( $post_id ) {
         if( isset( $_POST[ 'tracking_popup' ]) && wp_verify_nonce($_POST['wp_tracking_popup_nonce'], plugin_basename(__FILE__)) ) {
             $tracking_popup = $_POST[ 'tracking_popup' ];
             $tracking_object_popup = sanitize_text_field($_POST[ 'tracking_object_popup' ]);
-            $tracking_name_popup = sanitize_text_field($_POST[ 'tracking_name_popup' ]);
         }
        
             
@@ -443,8 +435,7 @@ function pages_meta_save( $post_id ) {
                     array('name' => 'expire_popup', 'value' => $expire_popup ),
                     array('name' => 'delay_popup', 'value' => $delay_popup ),
                     array('name' => 'tracking_popup', 'value' => $tracking_popup ),
-                    array('name' => 'tracking_object_popup', 'value' => $tracking_object_popup ),
-                    array('name' => 'tracking_name_popup', 'value' => $tracking_name_popup )
+                    array('name' => 'tracking_object_popup', 'value' => $tracking_object_popup )
                     );
         
         foreach($meta as $mt){

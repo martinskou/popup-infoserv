@@ -10,8 +10,7 @@ jQuery( document ).ready( function( $ ) {
                 statsNonce = propVal.ajax_nonce,
                 popupId = propVal.popupId,
                 tracking = propVal.tracking,
-                trackingObject = propVal.trackingObject,
-                trackingName = propVal.trackingName;
+                trackingObject = propVal.trackingObject;
 
             if(impressions == ""){
                 impressions = 0;
@@ -30,11 +29,11 @@ jQuery( document ).ready( function( $ ) {
                             $('#popup-' + popupId).fadeIn(350, function() {
                                 Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
                                 if(tracking == "true"){
-                                     ga('send', 'event', 'popup', 'show', window.location.href);
-                                     if(trackingObject !== "" && trackingName !== ""){
+                                     ga('send', 'event', 'popup', 'show', window.location.href,0);
+                                     if(trackingObject !== "" ){
                                         $(trackingObject).click(function(e) {
                                             //console.log("object has been clicked");
-                                            ga('send', 'event', 'popup', trackingName, window.location.href);
+                                            ga('send', 'event', 'popup', 'show', window.location.href,1);
                                         });
                                      }
                                 }
@@ -69,11 +68,11 @@ jQuery( document ).ready( function( $ ) {
                             $('#popup-' + popupId).fadeIn(350, function() {
                             Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
                             if(tracking == "true"){
-                                 ga('send', 'event', 'popup', 'show', window.location.href);
-                                 if(trackingObject !== "" && trackingName !== ""){
+                                 ga('send', 'event', 'popup', 'show', window.location.href,0);
+                                 if(trackingObject !== "" ){
                                     $(trackingObject).click(function(e) {
                                         //console.log("object has been clicked");
-                                        ga('send', 'event', 'popup', trackingName, window.location.href);
+                                        ga('send', 'event', 'popup', 'show', window.location.href,1);
                                     });
                                  }
                             }
@@ -104,11 +103,11 @@ jQuery( document ).ready( function( $ ) {
                         impressions = parseInt(impressions) + 1;
                         Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
                         if(tracking == "true"){
-                             ga('send', 'event', 'popup', 'show', window.location.href);
-                             if(trackingObject !== "" && trackingName !== ""){
+                             ga('send', 'event', 'popup', 'show', window.location.href,0);
+                             if(trackingObject !== "" ){
                                 $(trackingObject).click(function(e) {
                                     //console.log("object has been clicked");
-                                    ga('send', 'event', 'popup', trackingName, window.location.href);
+                                    ga('send', 'event', 'popup', 'show', window.location.href,1);
                                 });
                              }
                         }
