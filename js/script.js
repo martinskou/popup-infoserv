@@ -8,13 +8,16 @@ jQuery( document ).ready( function( $ ) {
                 impressions = propVal.impressions,
                 adminUrl = propVal.ajaxurl,
                 statsNonce = propVal.ajax_nonce,
-                popupId = propVal.popupId;
+                popupId = propVal.popupId,
+                tracking = propVal.tracking,
+                trackingObject = propVal.trackingObject,
+                trackingName = propVal.trackingName;
 
             if(impressions == ""){
                 impressions = 0;
             }
 
-            //console.log(propVal);
+            console.log(propVal);
 
             switch(triggerType) {
                 case "section":
@@ -26,6 +29,15 @@ jQuery( document ).ready( function( $ ) {
                             //console.log(popupId);  
                             $('#popup-' + popupId).fadeIn(350, function() {
                                 Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
+                                if(tracking == "true"){
+                                     ga('send', 'event', 'popup', 'show', window.location.href);
+                                     if(trackingObject !== "" && trackingName !== ""){
+                                        $(trackingObject).click(function(e) {
+                                            //console.log("object has been clicked");
+                                            ga('send', 'event', 'popup', trackingName, window.location.href);
+                                        });
+                                     }
+                                }
                                 jQuery.ajax({ // We use jQuery instead $ sign, because Wordpress convention.
                                     url : adminUrl, // This addres will redirect the query to the functions.php file, where we coded the function that we need.
                                     type : 'POST',
@@ -56,6 +68,15 @@ jQuery( document ).ready( function( $ ) {
                          function() {
                             $('#popup-' + popupId).fadeIn(350, function() {
                             Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
+                            if(tracking == "true"){
+                                 ga('send', 'event', 'popup', 'show', window.location.href);
+                                 if(trackingObject !== "" && trackingName !== ""){
+                                    $(trackingObject).click(function(e) {
+                                        //console.log("object has been clicked");
+                                        ga('send', 'event', 'popup', trackingName, window.location.href);
+                                    });
+                                 }
+                            }
                             jQuery.ajax({ // We use jQuery instead $ sign, because Wordpress convention.
                                 url : adminUrl, // This addres will redirect the query to the functions.php file, where we coded the function that we need.
                                 type : 'POST',
@@ -82,6 +103,16 @@ jQuery( document ).ready( function( $ ) {
                     $('#popup-' + popupId).delay( popupDelay ).fadeIn(350, function() {
                         impressions = parseInt(impressions) + 1;
                         Cookies.set("popup-" + popupId , "yes", {expires: popupExpire, path: '/'});
+                        if(tracking == "true"){
+                             ga('send', 'event', 'popup', 'show', window.location.href);
+                             if(trackingObject !== "" && trackingName !== ""){
+                                $(trackingObject).click(function(e) {
+                                    //console.log("object has been clicked");
+                                    ga('send', 'event', 'popup', trackingName, window.location.href);
+                                });
+                             }
+                        }
+                       
                         jQuery.ajax({ // We use jQuery instead $ sign, because Wordpress convention.
                             url : adminUrl, // This addres will redirect the query to the functions.php file, where we coded the function that we need.
                             type : 'POST',
@@ -111,6 +142,7 @@ jQuery( document ).ready( function( $ ) {
     $('[data-popup-close]').on('click', function(e)  {
         var targeted_popup = $(this).attr('data-popup-close');
         $('#' + targeted_popup).fadeOut(350);
+        ga('send', 'event', 'popup', 'close', window.location.href);
 		  e.preventDefault();
     });
     //----- CLOSE ON ESCAPE
@@ -125,6 +157,7 @@ jQuery( document ).ready( function( $ ) {
         if (e.hasOwnProperty("srcElement")) {
             if (e.srcElement.className== "popup pui_popup") {
                 $(".popup-close").click();
+                ga('send', 'event', 'popup', 'close', window.location.href);
             }
         }
    });

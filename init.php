@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Pop up by Infoserv
+Plugin Name: Pop-up by Infoserv
 Plugin URI: http://www.infoserv.dk/
-Description: Create pop up with content of your choice. Works well with Divi Builder.
-Version: 1.2.1
+Description: Create pop-ups with content of your choice. Works well with Divi Builder.
+Version: 1.2.2
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -88,7 +88,11 @@ function pui_enqueue_script() {
                              "impressions" => get_post_meta(get_the_ID(), 'impressions', true),
                              "thisPageId" => (string)get_queried_object_id(),
                              "ajaxurl" => admin_url("admin-ajax.php", $protocol),
-                             "ajax_nonce" => wp_create_nonce("stats_nonce"));
+                             "ajax_nonce" => wp_create_nonce("stats_nonce"),
+                             "tracking" => get_post_meta(get_the_ID(), 'tracking_popup', true),
+                             "trackingObject" => get_post_meta(get_the_ID(), 'tracking_object_popup', true),
+                             "trackingName" => get_post_meta(get_the_ID(), 'tracking_name_popup', true),
+                             );
 
         switch ($trigger_type) {
             case "all":
@@ -149,10 +153,10 @@ function create_popup_posttype() {
                 'edit_item' => __('Rediger pop-up', 'popup-by-infoserv'),
                 'new_item' => __('Ny pop-up', 'popup-by-infoserv'),
                 'view' => __('Vis', 'popup-by-infoserv'),
-                'view_item' => __('Vis pop up', 'popup-by-infoserv'),
+                'view_item' => __('Vis pop-up', 'popup-by-infoserv'),
                 'search_items' => __('Søg i pop-ups', 'popup-by-infoserv'),
                 'not_found' => __('Ingen pop-ups fundet', 'popup-by-infoserv'),
-                'not_found_in_trash' => __('Ingen pop upd fundet i papirkurven.', 'popup-by-infoserv'),
+                'not_found_in_trash' => __('Ingen pop-ups fundet i papirkurven.', 'popup-by-infoserv'),
                 'parent' => __('Hoved pop-up', 'popup-by-infoserv')
             ),
             'public' => true,
@@ -186,18 +190,26 @@ function adding_custom_meta_boxes( $post_type, $post ) {
         'side',
         'low' 
     );
-     add_meta_box( 
+   add_meta_box( 
         'delay_popup',
-        __( 'Antal sekunder før pop up' , 'popup-by-infoserv'),
+        __( 'Antal sekunder før pop-up' , 'popup-by-infoserv'),
         'render_delay_popup_meta_box',
         'popups',
         'side',
         'low'
     );
-     add_meta_box( 
+      add_meta_box( 
         'expire_popup',
-        __( 'Antal dage før pop up vises igen', 'popup-by-infoserv' ),
+        __( 'Antal dage før pop-up vises igen', 'popup-by-infoserv' ),
         'render_expire_popup_meta_box',
+        'popups',
+        'side',
+        'low'
+    );
+     add_meta_box( 
+        'tracking_popup',
+        __( 'Google Analytics Tracking (avanceret)', 'popup-by-infoserv' ),
+        'render_tracking_popup_meta_box',
         'popups',
         'side',
         'low'
@@ -297,7 +309,7 @@ function render_triggers_meta_box($post) {
     //echo $trigger_type;
 
     $html = '<div class="prfx-row-content" style="width: 100%; ">';
-    $html .= '<p style="float:left;width:100%;"><label for="meta-checkbox-'. get_the_id() .'">'. __('Sæt regler op for, hvornår denne pop up skal vises.', 'popup-by-infoserv') .'</label></p>';
+    $html .= '<p style="float:left;width:100%;"><label for="meta-checkbox-'. get_the_id() .'">'. __('Sæt regler op for, hvornår denne pop-up skal vises.', 'popup-by-infoserv') .'</label></p>';
     $html .= get_trigger_type_input($trigger_type);
     $html .= get_trigger_pages($post,$posts_array,$pages_stored_meta,$trigger_type);
     $html .= get_trigger_section_input($post,$trigger_section,$trigger_type);
@@ -317,11 +329,47 @@ function render_expire_popup_meta_box($post) {
     //print_r($icons );
     $html = '<div class="prfx-row-content" style="width: 100%; height: 160px;">';
     $html .='<p style="float:left;">
-        <label for="expire_popup" style="">'. __('Når brugeren lukker pop-up vinduet, sættes en cookie. Vælg her, hvor mange dage denne cookie skal gælde, før pop up vinduet vises for samme bruger igen.', 'popup-by-infoserv') .'<br></label></p>
+        <label for="expire_popup" style="">'. __('Når brugeren lukker pop-up vinduet, sættes en cookie. Vælg her, hvor mange dage denne cookie skal gælde, før pop-up vinduet vises for samme bruger igen.', 'popup-by-infoserv') .'<br></label></p>
         <input type="number" name="expire_popup" id="expire_popup" value="'. $expire_popup .'" /><div><i>Standard: 60</i></div>';
     $html .= '</div>';
     echo $html;
 }
+
+function render_tracking_popup_meta_box($post) {
+    wp_nonce_field(plugin_basename(__FILE__), 'wp_tracking_popup_nonce');
+    
+    if(!empty(get_post_meta( $post->ID, 'tracking_popup' ))){
+        $tracking_popup = get_post_meta( $post->ID, 'tracking_popup', true );
+    }
+    else{
+        $tracking_popup = "false";
+    }
+    if(!empty(get_post_meta( $post->ID, 'tracking_object_popup' ))){
+        $tracking_object_popup = get_post_meta( $post->ID, 'tracking_object_popup', true );
+    }
+    else{
+        $tracking_object_popup = "";
+    }
+    if(!empty(get_post_meta( $post->ID, 'tracking_name_popup' ))){
+        $tracking_name_popup = get_post_meta( $post->ID, 'tracking_name_popup', true );
+    }
+    else{
+        $tracking_name_popup = "";
+    }
+   
+    $html = '<div class="prfx-row-content" style="width: 100%; ">';
+    $html .='<p style="">'. __('Inden du aktiverer tracking, venligst tjek efter om du har inkluderet Google Analytics tracking script.', 'popup-by-infoserv') .'<br></p>
+       <div><label for="tracking_popup" style=""><input type="checkbox" name="tracking_popup" id="tracking_popup" value="true" '. ($tracking_popup !== 'true' ? ' ' : ' checked ') .'/> Aktiver tracking</label></div>';
+     $html .='<p style="">'. __('Opsæt disse to hændelses-mål på din Google Analytics konto:', 'popup-by-infoserv') .'<br></p>';
+     $html .='<ul><li style="">'. __('Kategori: popup, Handling: show', 'popup-by-infoserv') .'</li>';
+     $html .='<li style="">'. __('Kategori: popup, Handling: close', 'popup-by-infoserv') .'</li></ul>';
+     $html .='<h4>'. __('Konverteringsmål', 'popup-by-infoserv') .'</h4><p style="">'. __('Opsæt konverteringsmål ved at indtaste ID på det element, som skal fungere som konvertering.', 'popup-by-infoserv') .'<br></p>
+       <div><p><label for="tracking_object_popup" style="">'. __('ID på konverterings-element:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_object_popup" id="tracking_object_popup" value="'. $tracking_object_popup .'" /><div><i>(eksempelvis #knap)</i></div>
+       <p><label for="tracking_name_popup" style="">'. __('Konverteringsnavn:', 'popup-by-infoserv') .'</label></p><input type="text" name="tracking_name_popup" id="tracking_name_popup" value="'. $tracking_name_popup .'" /><div><i>(Husk at angive dette som handling i Analytics)</i></div></div>';
+    $html .= '</div>';
+    echo $html;
+}
+
 
 function render_delay_popup_meta_box($post) {
     wp_nonce_field(plugin_basename(__FILE__), 'wp_delay_popup_nonce');
@@ -335,7 +383,7 @@ function render_delay_popup_meta_box($post) {
     //print_r($icons );
     $html = '<div class="prfx-row-content" style="width: 100%; height: 180px;">';
     $html .='<p style="float:left;">
-        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop up vises, efter siden er loadet. Denne indstilling bliver ignoreret ved følgende triggers: "Scroll til sektion" og "På vej væk fra siden."', 'popup-by-infoserv') .'<br></label></p>
+        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop-up vises, efter siden er loadet. Denne indstilling bliver ignoreret ved følgende triggers: "Scroll til sektion" og "På vej væk fra siden."', 'popup-by-infoserv') .'<br></label></p>
         <input type="number" name="delay_popup" id="delay_popup" value="'. $delay_popup .'" /><div><i>Standard: 3</i></div>';
     $html .= '</div>';
     echo $html;
@@ -349,6 +397,11 @@ function pages_meta_save( $post_id ) {
         $triggers = array();
         $expire_popup = "60";
         $delay_popup = "3";
+
+        //$tracking_popup = "false";
+        //$tracking_object_popup = "";
+        //$tracking_name_popup = "";
+
 
         // If this isn't a 'popups' post, don't update it.
         $post_type = get_post_type($post_id);
@@ -376,12 +429,22 @@ function pages_meta_save( $post_id ) {
             $delay_popup = sanitize_text_field($_POST[ 'delay_popup' ]);
             
         }
+        if( isset( $_POST[ 'tracking_popup' ]) && wp_verify_nonce($_POST['wp_tracking_popup_nonce'], plugin_basename(__FILE__)) ) {
+            $tracking_popup = $_POST[ 'tracking_popup' ];
+            $tracking_object_popup = sanitize_text_field($_POST[ 'tracking_object_popup' ]);
+            $tracking_name_popup = sanitize_text_field($_POST[ 'tracking_name_popup' ]);
+        }
+       
+            
         $meta = array(
                     array('name' => 'triggers', 'value' => $triggers),
                     array('name' => 'trigger_type', 'value' => $trigger_type),
                     array('name' => 'trigger_section', 'value' => $trigger_section ),
                     array('name' => 'expire_popup', 'value' => $expire_popup ),
-                    array('name' => 'delay_popup', 'value' => $delay_popup )
+                    array('name' => 'delay_popup', 'value' => $delay_popup ),
+                    array('name' => 'tracking_popup', 'value' => $tracking_popup ),
+                    array('name' => 'tracking_object_popup', 'value' => $tracking_object_popup ),
+                    array('name' => 'tracking_name_popup', 'value' => $tracking_name_popup )
                     );
         
         foreach($meta as $mt){
@@ -390,7 +453,7 @@ function pages_meta_save( $post_id ) {
 }
 add_action( 'save_post', 'pages_meta_save' );
 
-//updating statistics on pop up
+//updating statistics on pop up via ajax
 
 add_action( 'wp_ajax_pui_stats_action', 'pui_stats_action' );
 add_action( 'wp_ajax_nopriv_pui_stats_action', 'pui_stats_action' ); // This lines it's because we are using AJAX on the FrontEnd.
