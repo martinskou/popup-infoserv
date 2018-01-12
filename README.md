@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.5~
+~Current Version:1.2.6~
 
 == Changelog ==
+1.2.6
+- New trigger: click on element (Ved klik på element). Specify the element by ID.
+
 1.2.5
 - better analytics guide text
 

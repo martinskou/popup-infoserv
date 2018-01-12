@@ -18,6 +18,13 @@ $("#trigger_type").change(function() {
     else{
     	$('#trigger_section_container').hide();
     }
+    if($("#trigger_type").val()==="click"){ 
+        console.log("selected");
+        $('#trigger_click_container').show();
+    }
+    else{
+        $('#trigger_click_container').hide();
+    }
    
 });
 });

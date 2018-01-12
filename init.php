@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop-ups with content of your choice. Works well with Divi Builder.
-Version: 1.2.5
+Version: 1.2.6
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -104,6 +104,9 @@ function pui_enqueue_script() {
             case "section":
                 array_push($popups, array_merge($default_val, array("triggerSection" => get_post_meta(get_the_ID(), 'trigger_section', true))));
                 break;
+            case "click":
+                array_push($popups, array_merge($default_val, array("triggerClick" => get_post_meta(get_the_ID(), 'trigger_click', true))));
+                break;
             case "exitintent":
                 array_push($popups, array_merge($default_val, array("popupDelay" => get_post_meta(get_the_ID(), 'delay_popup', true))));
                 break;
@@ -165,7 +168,7 @@ function create_popup_posttype() {
             'has_archive' => false,
             'publicly_queryable'  => false,
             'show_in_admin_bar'   => false,
-            'rewrite' => array('slug' => 'pop-ups', 'with_front' => false)
+            'rewrite' => array('with_front' => false)
         )
     );
 };
@@ -252,6 +255,7 @@ function get_trigger_type_input($trigger_type){
             <option value="specific" '. ($trigger_type == "specific" ? ' selected' : ' ') .'>'. __('Specifikke sider', 'popup-by-infoserv') .'</option>
             <option value="section" '. ($trigger_type == "section" ? ' selected' : ' ') .'>'. __('Ved scroll til sektion' , 'popup-by-infoserv') .'</option>
             <option value="exitintent" '. ($trigger_type == "exitintent" ? ' selected' : ' ') .'>'. __('På vej væk fra siden' , 'popup-by-infoserv') .'</option>
+            <option value="click" '. ($trigger_type == "click" ? ' selected' : ' ') .'>'. __('Ved klik på element' , 'popup-by-infoserv') .'</option>
             </select>';
     return $html;
 }
@@ -281,6 +285,13 @@ function get_trigger_section_input($post,$trigger_section,$trigger_type){
     return $html;
 }
 
+function get_trigger_click_input($post,$trigger_click,$trigger_type){
+    $html ='<div id="trigger_click_container" style="'. ($trigger_type == 'click' ? ' ' : 'display:none;') .'"><p style="float:left;width:100%;">
+        <label for="trigger_click" style=""><b>'. __('ID på element', 'popup-by-infoserv') .'</b></label></p><p><i>(eksempelvis #knap)</i></p>
+        <input type="text" id="trigger_click" name="trigger_click" value="'. $trigger_click .'"></div>';
+    return $html;
+}
+
 function render_triggers_meta_box($post) {
     
     wp_nonce_field(plugin_basename(__FILE__), 'wp_triggers_nonce');
@@ -305,6 +316,12 @@ function render_triggers_meta_box($post) {
     else{
         $trigger_section = "";
     }
+    if(!empty(get_post_meta( $post->ID, 'trigger_click', true ))){
+        $trigger_click = get_post_meta( $post->ID, 'trigger_click', true );
+    }
+    else{
+        $trigger_click = "";
+    }
     //echo $trigger_type;
 
     $html = '<div class="prfx-row-content" style="width: 100%; ">';
@@ -312,6 +329,7 @@ function render_triggers_meta_box($post) {
     $html .= get_trigger_type_input($trigger_type);
     $html .= get_trigger_pages($post,$posts_array,$pages_stored_meta,$trigger_type);
     $html .= get_trigger_section_input($post,$trigger_section,$trigger_type);
+    $html .= get_trigger_click_input($post,$trigger_click,$trigger_type);
     $html .= '</div>';
     echo $html;
 }
@@ -375,9 +393,9 @@ function render_delay_popup_meta_box($post) {
         $delay_popup = "3";
     }
     //print_r($icons );
-    $html = '<div class="prfx-row-content" style="width: 100%; height: 180px;">';
+    $html = '<div class="prfx-row-content" style="width: 100%; height: 200px;">';
     $html .='<p style="float:left;">
-        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop-up vises, efter siden er loadet. Denne indstilling bliver ignoreret ved følgende triggers: "Scroll til sektion" og "På vej væk fra siden."', 'popup-by-infoserv') .'<br></label></p>
+        <label for="delay_popup" style="">'. __('Vælg hvor mange sekunder der skal gå, før pop-up vises, efter siden er loadet. Denne indstilling bliver ignoreret ved følgende triggers: "Scroll til sektion", "På vej væk fra siden." og og "Ved klik på element"', 'popup-by-infoserv') .'<br></label></p>
         <input type="number" name="delay_popup" id="delay_popup" value="'. $delay_popup .'" /><div><i>Standard: 3</i></div>';
     $html .= '</div>';
     echo $html;
@@ -388,13 +406,14 @@ function pages_meta_save( $post_id ) {
         
         $trigger_type = "all";
         $trigger_section = "";
+        $trigger_click = "";
         $triggers = array();
         $expire_popup = "60";
         $delay_popup = "3";
 
-        //$tracking_popup = "false";
-        //$tracking_object_popup = "";
-        //$tracking_name_popup = "";
+        $tracking_popup = "false";
+        $tracking_object_popup = "";
+        $tracking_name_popup = "";
 
 
         // If this isn't a 'popups' post, don't update it.
@@ -412,6 +431,10 @@ function pages_meta_save( $post_id ) {
         }
         if( isset( $_POST[ 'trigger_section' ]) && wp_verify_nonce($_POST['wp_triggers_nonce'], plugin_basename(__FILE__)) ) {
             $trigger_section = sanitize_text_field($_POST[ 'trigger_section' ]);
+            
+        }
+        if( isset( $_POST[ 'trigger_click' ]) && wp_verify_nonce($_POST['wp_triggers_nonce'], plugin_basename(__FILE__)) ) {
+            $trigger_click = sanitize_text_field($_POST[ 'trigger_click' ]);
             
         }
 
@@ -433,6 +456,7 @@ function pages_meta_save( $post_id ) {
                     array('name' => 'triggers', 'value' => $triggers),
                     array('name' => 'trigger_type', 'value' => $trigger_type),
                     array('name' => 'trigger_section', 'value' => $trigger_section ),
+                    array('name' => 'trigger_click', 'value' => $trigger_click ),
                     array('name' => 'expire_popup', 'value' => $expire_popup ),
                     array('name' => 'delay_popup', 'value' => $delay_popup ),
                     array('name' => 'tracking_popup', 'value' => $tracking_popup ),

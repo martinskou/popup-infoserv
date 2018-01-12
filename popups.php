@@ -37,6 +37,15 @@ function get_popups(){
 								</div>';
 					}
 					break;
+				 case "click":
+	            	echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
+							    <div class="popup-inner">
+							      '. do_shortcode(get_the_content()) .'
+							     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
+							        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
+							    </div>
+							</div>';
+					break;
 	            default: 
 	            	echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
 							    <div class="popup-inner">
