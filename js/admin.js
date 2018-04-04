@@ -8,6 +8,9 @@ $("#trigger_type").change(function() {
     	console.log("selected");
     	$('#triggers_container').show();
     }
+    else if($("#trigger_type").val()==="exitintent"){
+         $('#triggers_container').show();
+    }
     else{
     	$('#triggers_container').hide();
     }

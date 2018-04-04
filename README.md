@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.6~
+~Current Version:1.2.7~
 
 == Changelog ==
+1.2.7
+- Exit intent trigger: now possible to choose on which pages the pop-up is shown.
+
 1.2.6
 - New trigger: click on element (Ved klik på element). Specify the element by ID.
 
