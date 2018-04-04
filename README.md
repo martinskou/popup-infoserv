@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.7~
+~Current Version:1.2.8~
 
 == Changelog ==
+1.2.8
+- fixed version no.
+
 1.2.7
 - Exit intent trigger: now possible to choose on which pages the pop-up is shown.
 
