@@ -3,7 +3,7 @@
 Plugin Name: Pop up by Infoserv
 Plugin URI: http://www.infoserv.dk/
 Description: Create pop-ups with content of your choice. Works well with Divi Builder.
-Version: 1.2.8
+Version: 1.2.9
 Author: Jesper Hellner Sørensen
 Author URI: http://www.infoserv.dk/
 
@@ -261,8 +261,9 @@ function get_trigger_type_input($trigger_type){
 }
 
 function get_trigger_pages($post,$posts_array,$pages_stored_meta,$trigger_type){
-    $html = '<div id="triggers_container" style="'. ($trigger_type == 'specific' ? ' ' : 'display:none;') .' width: 100%; height: 300px;overflow: auto;margin-bottom: 20px;">';
-
+    $html = '<div id="triggers_container" style="'. ($trigger_type == 'specific' || $trigger_type == 'exitintent' ? ' ' : 'display:none;') .' width: 100%; height: 300px;overflow: auto;margin-bottom: 20px;">';
+    $html .=  '<p><b>'. __('Vælg sider', 'popup-by-infoserv') .'</b></p>';
+    $html .= '<p><label for="meta-checkbox-all"><input type="checkbox" name="triggers[]" id="meta-checkbox-all" value="all" '. (in_array('all', $pages_stored_meta[0]) ? ' checked' : ' ') .'  /> <strong>Alle</strong></label></p>';
             while ( $posts_array->have_posts() ) : $posts_array->the_post();
                 global $post;
                 $html .='<p>

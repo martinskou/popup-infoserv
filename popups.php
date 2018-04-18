@@ -36,10 +36,29 @@ function get_popups(){
 								    </div>
 								</div>';
 					}
+					else if(in_array('all', $trigger_arr[0] )){
+						echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
+								    <div class="popup-inner">
+								      '. do_shortcode(get_the_content()) .'
+								     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
+								        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
+								    </div>
+								</div>';
+					}
 					break;
 				case "exitintent":
+					//echo "TRIGGER TYPE!!" . $trigger_arr[0];
 					if(in_array((string)get_queried_object_id(), $trigger_arr[0] ) ){
 		            	echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
+								    <div class="popup-inner">
+								      '. do_shortcode(get_the_content()) .'
+								     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>
+								        <a class="popup-close" data-popup-close="popup-'. get_the_id() . '" href="#">x</a>
+								    </div>
+								</div>';
+					}
+					else if(in_array('all', $trigger_arr[0] )){
+						echo '<div id="popup-'. get_the_id() . '" class="popup pui_popup" data-popup="popup-'. get_the_id() . '">
 								    <div class="popup-inner">
 								      '. do_shortcode(get_the_content()) .'
 								     <p><a data-popup-close="popup-'. get_the_id() . '" href="#"></a></p>

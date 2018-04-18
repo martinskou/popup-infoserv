@@ -1,8 +1,11 @@
 # popup-infoserv
 == Wordpress plugin ==
-~Current Version:1.2.8~
+~Current Version:1.2.9~
 
 == Changelog ==
+1.2.9
+- Now possible to choose "All pages" on exit intent trigger type.
+
 1.2.8
 - fixed version no.
 

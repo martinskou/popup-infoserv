@@ -4,13 +4,11 @@ jQuery( document ).ready( function( $ ) {
 
 $("#trigger_type").change(function() {
 	console.log("change");
-    if($("#trigger_type").val()==="specific"){ 
+    if($("#trigger_type").val()==="specific" || $("#trigger_type").val()=== "exitintent"){ 
     	console.log("selected");
     	$('#triggers_container').show();
     }
-    else if($("#trigger_type").val()==="exitintent"){
-         $('#triggers_container').show();
-    }
+   
     else{
     	$('#triggers_container').hide();
     }
